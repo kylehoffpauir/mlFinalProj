@@ -16,23 +16,37 @@ import matplotlib.pyplot as plt # plotting
 import numpy as np # linear algebra
 import os # accessing directory structure
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import unidecode
 
 # Adapted from:
 # https://www.kaggle.com/code/kerneler/starter-rap-lyrics-8dd83bf6-f
 # https://www.kaggle.com/code/offmann/nlp-on-hiphop-lyrics
+import unicodedata
 
+def remove_accents(input_str):
+    for l in input_str:
+        for character in l:
+            line = ""
+            if character.isalnum() :
+                line += character
+        input_str += re.sub("[\w\-\s]","",line)
+    return input_str
 data = {}
 frames = []
 df = pd.DataFrame()
 for dirname, _, filenames in os.walk('hiphop/'):
     for filename in filenames:
         rapper = filename.split('_')[0]
-        with open(os.path.join(dirname, filename), encoding='latin1') as f:
-            content = f.read().strip().splitlines()
+        with open(os.path.join(dirname, filename), encoding='utf-8') as f:
+            content = remove_accents(f.read())
+            content = content.splitlines()
             for i in range(len(content)-2, -1, -1):
-                if not content[i] == '':
-                    content[i] = content[i] + ' ' + content.pop(i+1)
-            data['rapper'], data['verse'] = rapper, content[1::2]
+                if content[i].isascii():
+                    content[i] = (content[i] + ' ' + content.pop(i+1)).strip()
+            verse = content[1::2]
+            if verse is "":
+                continue
+            data['rapper'], data['verse'] = rapper, verse
             df_temp = pd.DataFrame(data)
             frames.append(df_temp)
             df = pd.concat(frames)
@@ -42,6 +56,7 @@ print(df.head())
 # Drop the duplicate verses (they appear several times in choruses)
 print(len(df))
 df = df.drop_duplicates(subset=['verse'])
+df.dropna(inplace= True)
 print(len(df))
 # Let's regroup tupac1 and tupac2 lyrics as one single rapper
 func = lambda x: 'Tupac' if 'Tupac' in x else x
@@ -79,6 +94,7 @@ def bigram(s):
 
     return ' '.join(s1)
 df['verse_preprocessed'] = df['verse'].map(lambda x:preprocess_verse(x, stopwords))
+df['verse_preprocessed'] = df['verse_preprocessed'].dropna()
 df['verse_bigrams'] = df['verse_preprocessed'].map(lambda x:bigram(x))
 print(df.head(2))
 # Let's see if we have any weird words in the dataset. Let's plot the occurrences of the words
@@ -103,7 +119,7 @@ def plot_words(vocab):
     plt.show()
 
 
-plot_words(vocab(df, 'verse_preprocessed', 40, stopwords))
+#plot_words(vocab(df, 'verse_preprocessed', 40, stopwords))
 
 
 
@@ -121,7 +137,7 @@ def word_cloud_by_rapper(rapper, col):
     plt.show()
 
 
-word_cloud_by_rapper('Earl Sweatshirt', 'verse_preprocessed')
+#word_cloud_by_rapper('Earl Sweatshirt', 'verse_preprocessed')
 #word_cloud_by_rapper('Pusha-T', 'verse_bigrams')
 
 from urllib.request import urlopen
@@ -144,7 +160,6 @@ def is_curse(verse, curse_words):
 
 df['is_curse'] = df['verse_preprocessed'].map(lambda x:is_curse(x, curse_words))
 
-
 # Percentage of verses that contain curse words per rapper
 curse_dict = {}
 
@@ -154,5 +169,31 @@ for rapper in df.rapper.value_counts().keys():
 print(curse_dict)
 
 
+# Let's plot the results
 
+curse_df = pd.DataFrame(curse_dict).T
+print(curse_df.info())
+# plot grouped bar chart
+curse_df.sort_values(1).plot(kind="bar",figsize=(18,18))
+plt.show()
+
+# https://www.kaggle.com/code/paultimothymooney/poetry-generator-rnn-markov
+
+from flair.models import TextClassifier
+from flair.data import Sentence
+sia = TextClassifier.load('en-sentiment')
+def flair_prediction(x):
+    sentence = Sentence(x)
+    sia.predict(sentence)
+    print(sentence)
+    score = sentence.labels[0]
+    if "POSITIVE" in str(score):
+        return "pos"
+    elif "NEGATIVE" in str(score):
+        return "neg"
+    else:
+        return "neu"
+
+df["sentiment"] = df['verse_preprocessed'].apply(flair_prediction)
+df.to_csv('cleanedRap2.csv',encoding='utf-8-sig')
 
