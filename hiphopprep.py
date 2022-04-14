@@ -17,10 +17,11 @@ import numpy as np # linear algebra
 import os # accessing directory structure
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import unidecode
-
+nltk.download('stopwords')
 # Adapted from:
 # https://www.kaggle.com/code/kerneler/starter-rap-lyrics-8dd83bf6-f
 # https://www.kaggle.com/code/offmann/nlp-on-hiphop-lyrics
+# https://www.youtube.com/watch?v=6ORnRAz3gnA
 import unicodedata
 
 def remove_accents(input_str):
@@ -29,7 +30,7 @@ def remove_accents(input_str):
             line = ""
             if character.isalnum() :
                 line += character
-        input_str += re.sub("[\w\-\s]","",line)
+        input_str += re.sub("[\w\s\n]","",line)
     return input_str
 data = {}
 frames = []
@@ -38,13 +39,15 @@ for dirname, _, filenames in os.walk('hiphop/'):
     for filename in filenames:
         rapper = filename.split('_')[0]
         with open(os.path.join(dirname, filename), encoding='utf-8') as f:
-            content = remove_accents(f.read())
+            content = f.read()
             content = content.splitlines()
+            re.sub(r'[^\x00-\x7f]', r'', content)
             for i in range(len(content)-2, -1, -1):
                 if content[i].isascii():
                     content[i] = (content[i] + ' ' + content.pop(i+1)).strip()
             verse = content[1::2]
-            if verse is "":
+            for v in verse: v.strip()
+            if verse == "":
                 continue
             data['rapper'], data['verse'] = rapper, verse
             df_temp = pd.DataFrame(data)

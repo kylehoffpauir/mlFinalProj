@@ -2,8 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="339298ca-97b5-42e3-8528-4564be090fab" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/generator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Figure_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PoetryFoundationData.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cleanedRap.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/philosophyTf.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/philosophy_data.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/poetryTf.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tfgenerator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hiphop.zip" beforeDir="false" afterPath="$PROJECT_DIR$/hiphop.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hiphopprep.py" beforeDir="false" afterPath="$PROJECT_DIR$/hiphopprep.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -56,6 +63,7 @@
       <option name="presentableId" value="Default" />
       <updated>1649702787314</updated>
       <workItem from="1649702789528" duration="23316000" />
+      <workItem from="1649886116700" duration="16604000" />
     </task>
     <task id="LOCAL-00001" summary="datacleaning">
       <created>1649705490929</created>
@@ -82,7 +90,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
